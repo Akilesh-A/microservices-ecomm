@@ -10,7 +10,7 @@ function ProductImageUpload({imageFile,
   setImageFile,
   uploadedImageUrl,
   setUploadedImageUrl,
-setImageLoadingState,imageLoadingState}) {
+setImageLoadingState,imageLoadingState,currentEditedId}) {
        
 
     const inputRef=useRef(null);
@@ -85,8 +85,8 @@ setImageLoadingState,imageLoadingState}) {
   return (
     <div className='w-full max-w-md mx-auto mt-4'>
         <Label className='text-lg font-semibold mb-2 block'>Upload image</Label>
-        <div onDragOver={handelDragOver} onDrop={handelDrop} className='border-2 border-dashed rounded-lg p-4'>
-            <Input id='image-upload' type='file' ref={inputRef} onChange={handleImageFileChange} className='hidden' ></Input>
+        <div onDragOver={handelDragOver} onDrop={handelDrop} className={`${currentEditedId ? "opacity-60 cursor-not-allowed": ""} border-2 border-dashed rounded-lg p-4`}>
+            <Input id='image-upload' type='file' ref={inputRef} onChange={handleImageFileChange} className='hidden' disable={currentEditedId}></Input>
             {
                 !imageFile ? 
                 <Label htmlFor='image-upload' className='flex flex-col items-center justify-center h-32 cursor-pointer'>
