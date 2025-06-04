@@ -17,6 +17,7 @@ function Form({
   onSubmit,
   buttonText,
   isBtnDisabled,
+ 
 }) {
   function renderInputsByComponentType(getControlItem) {
     // console.log(getControlItem);
