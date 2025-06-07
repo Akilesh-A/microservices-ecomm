@@ -38,8 +38,6 @@ const addProduct=async (req,res)=>{
             success:true,
             data:newlyCreatedProduct,
         })
-        
-
     }catch(err){
         console.log(err);
         res.json({

@@ -6,7 +6,15 @@ const cookieParser=require('cookie-parser');
 const cors=require('cors');
 
 const authRouter=require("../server/routes/auth/authRoutes");
-const adminProuductRouter=require("../server/routes/admin/products-routes")
+const adminProuductRouter=require("../server/routes/admin/products-routes");
+const shopProductRouter=require("./routes/shop/products-routes")
+
+
+
+
+
+
+
 mongoose.connect('mongodb+srv://akileshanand21:Wt0IKBE3lULspH3F@mern-microservice.uo9efbk.mongodb.net/').then(()=>{
     console.log("mongo connected");
     
@@ -36,6 +44,8 @@ app.use(express.json());
 
 app.use('/api/auth',authRouter);
 app.use('/api/admin/products',adminProuductRouter);
+app.use('/api/shop/products',shopProductRouter);
+
 
 
 app.listen(PORT,()=>{
