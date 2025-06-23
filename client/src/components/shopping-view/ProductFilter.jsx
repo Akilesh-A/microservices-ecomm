@@ -5,6 +5,10 @@ import { Checkbox } from '../ui/checkbox'
 import { Separator } from '../ui/separator'
 
 function ProductFilter({filters,handelFilter}) {
+
+  
+  
+  
   return (
     <div className='bg-background rounded-lg shadow-sm'>
         <div className='p-4 border-b'>
@@ -19,7 +23,7 @@ function ProductFilter({filters,handelFilter}) {
                     <div className='grid gap-2 mt-2'>
                         {
                             filterOptions[keyItem].map(option=><Label key={option.id} className='flex items-center gap-2 font-medium'>
-                                <Checkbox onCheckedChange={()=>handelFilter(keyItem,option.id)} />{option.label}
+                                <Checkbox checked={filters && Object.keys(filters).length>0 && filters[keyItem] && filters[keyItem].indexOf(option.id)>-1} onCheckedChange={()=>handelFilter(keyItem,option.id)} />{option.label}
 
                             </Label>)
                         }

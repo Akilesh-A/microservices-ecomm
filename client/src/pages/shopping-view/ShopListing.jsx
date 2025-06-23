@@ -10,17 +10,36 @@ import {
 import { sortOptions } from "@/config";
 
 import { ArrowUpDown } from "lucide-react";
-import {fetchAllFilteredProducts} from "@/store/shop/products-slice"
+import {fetchAllFilteredProducts, fetchProductDetails} from "@/store/shop/products-slice"
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import ShoppingProductTile from "@/components/shopping-view/ShoppingProductTile";
+import { createSearchParams, useParams, useSearchParams } from "react-router-dom";
 
+
+const createSearchParamsHelper=(filterParams)=>{
+const queryParams=[];
+
+for(const [key,value] of Object.entries(filterParams)){
+  // console.log(value ,"abc");
+  
+  if(Array.isArray(value) && value.length>0){
+    const paramValue = value.join(',');
+    queryParams.push(`${key}=${encodeURIComponent(paramValue)}`)
+
+  }
+}
+return queryParams.join('&')
+  
+
+}
 function ShopListing() {
   const dispatch=useDispatch();
-  const [filters,setFilters]=useState(null);
-  const [sort,setSort]=useState(null)
+  const [filters,setFilters]=useState({});
+  const [sort,setSort]=useState(null);
+  const [searchParms,setSearchParms]=useSearchParams()
 
-  const {productList}=useSelector(state=>state.shopProducts)
+  const {productList,productDetails}=useSelector(state=>state.shopProducts)
  
   const handelSort =(value)=>{
     // console.log(value,"value");
@@ -29,19 +48,66 @@ function ShopListing() {
 
   const handelFilter=(getSectionId,getCurrentOption)=>{
     console.log(getSectionId,getCurrentOption);
-    
 
+    let cpyFilters={...filters};
+    const indexOfCurrentSection = Object.keys(cpyFilters).indexOf(getSectionId);
+    // console.log(indexOfCurrentSection);
+    
+    if(indexOfCurrentSection===-1){
+      cpyFilters={
+        ...cpyFilters,[getSectionId]:[getCurrentOption]
+      }
+    }else{
+      const indexOfCurrentOption=cpyFilters[getSectionId].indexOf(getCurrentOption);
+      
+      if(indexOfCurrentOption===-1){
+        cpyFilters[getSectionId].push(getCurrentOption);
+      }else{
+        cpyFilters[getSectionId].splice(indexOfCurrentOption,1)
+      }
+    }
+    setFilters(cpyFilters);
+    sessionStorage.setItem("filters",JSON.stringify(cpyFilters))
 
   }
+   useEffect(()=>{
+    if(filters && Object.keys(filters).length>0){
+      const createQueryString = createSearchParamsHelper(filters)
+      setSearchParms(new URLSearchParams(createQueryString))
+
+    }
+
+   },[filters])
+  useEffect(()=>{
+    setSort('price-lowtohigh');
+    setFilters(JSON.parse(sessionStorage.getItem('filters')) || {})
+
+  },[])
 
   // fetch list of products
   useEffect(()=>{
-      dispatch(fetchAllFilteredProducts())
-  },[dispatch])
+    if(filters !== null && sort !==null ){
+ dispatch(fetchAllFilteredProducts({filterParams:filters,sortParams:sort}))
+
+    }
+     
+  },[dispatch,sort,filters])
+
+  // console.log(searchParms);
+
+
+    const handelGetProductDetails=(getCurrentProductId)=>{
+      // console.log(getCurrentProductId);
+      dispatch(fetchProductDetails(getCurrentProductId))
+      
+
+    }
+    console.log(productDetails,'productDetails');
+    
 
   
   return (
-    <div className="grid grid-cols-1 md:grid-cols-[300px_1fr] gap-6 p-4 md:p-6 ">
+    <div className="grid grid-cols-1 md:grid-cols-[200px_1fr] gap-6 p-4 md:p-6 ">
       <ProductFilter filters={filters} handelFilter={handelFilter} />
       <div className="bg-background w-full rounded-lg shadow-sm">
         <div className="p-4 border-b flex items-center justify-between">
@@ -71,7 +137,7 @@ function ShopListing() {
 
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 p-4">
           {
-            productList && productList.length >0 ? productList.map(productItem=> <ShoppingProductTile product={productItem}/>):null
+            productList && productList.length >0 ? productList.map(productItem=> <ShoppingProductTile handelGetProductDetails={handelGetProductDetails} product={productItem}/>):null
           }
 
 
