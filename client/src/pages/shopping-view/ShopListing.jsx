@@ -15,6 +15,7 @@ import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import ShoppingProductTile from "@/components/shopping-view/ShoppingProductTile";
 import { createSearchParams, useParams, useSearchParams } from "react-router-dom";
+import ProductDetailDialog from "@/components/shopping-view/ProductDetailDialog";
 
 
 const createSearchParamsHelper=(filterParams)=>{
@@ -37,7 +38,9 @@ function ShopListing() {
   const dispatch=useDispatch();
   const [filters,setFilters]=useState({});
   const [sort,setSort]=useState(null);
-  const [searchParms,setSearchParms]=useSearchParams()
+  const [searchParms,setSearchParms]=useSearchParams();
+  const [openDetailsDialog,setOpenDetailsDialog]=useState(false);
+
 
   const {productList,productDetails}=useSelector(state=>state.shopProducts)
  
@@ -87,23 +90,21 @@ function ShopListing() {
   // fetch list of products
   useEffect(()=>{
     if(filters !== null && sort !==null ){
- dispatch(fetchAllFilteredProducts({filterParams:filters,sortParams:sort}))
-
+    dispatch(fetchAllFilteredProducts({filterParams:filters,sortParams:sort}))
     }
      
   },[dispatch,sort,filters])
-
-  // console.log(searchParms);
-
-
     const handelGetProductDetails=(getCurrentProductId)=>{
       // console.log(getCurrentProductId);
       dispatch(fetchProductDetails(getCurrentProductId))
-      
-
     }
     console.log(productDetails,'productDetails');
-    
+    useEffect(()=>{
+      if(productDetails !==null) {
+        setOpenDetailsDialog(true)
+      }
+
+    },[productDetails])
 
   
   return (
@@ -134,15 +135,15 @@ function ShopListing() {
             </DropdownMenu>
           </div>
         </div>
-
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 p-4">
           {
             productList && productList.length >0 ? productList.map(productItem=> <ShoppingProductTile handelGetProductDetails={handelGetProductDetails} product={productItem}/>):null
           }
-
-
         </div>
+      
       </div>
+        <ProductDetailDialog open={openDetailsDialog} setOpen={setOpenDetailsDialog} product={productDetails} />
+      
     </div>
   );
 }
