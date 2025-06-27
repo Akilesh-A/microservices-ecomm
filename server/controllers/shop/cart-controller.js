@@ -57,6 +57,17 @@ const fetchCartItems = async(req,res)=>{
                 message:"user id is mandatory"
             })
         }
+        const cart= await Cart.findOne({userId}).populate({
+            path:'item.productId',
+            select:"image title price salePrice"
+        })
+        if(!cart){
+            return req.status(404).json({
+                success:false,
+                message:"cart not found"
+            })
+        }
+        
 
     }catch(err){
         console.log(err);
